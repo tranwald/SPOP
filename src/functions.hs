@@ -28,12 +28,16 @@ b = Block (Just 2) 2 [0,1,2,3,4,5,6]
 bs :: [Block]
 bs = [Block (Just 2) 2 [0,1,2,3,4,5,6],Block(Just 5) 1 [3,4,5,6,7,8,9]]
 
-xss =  [[False,True,True,False,False,False,False,False,False,False,True],
-		[True,True,True,True,False,False,False,False,True,True],
-		[True,False,False,True,True,True,True,True,True,True],
-		[True,True,True,True,False,False,False,False,False,False],
-		[False,True,True,False,False,False,False,False,False,False],
-		[False,False,False,False,False,False,False,False,False,False]]
+xss =  [[False,True,True,True,False,False],
+		[True,True,False,True,True,False],
+		[True,True,False,True,True,False],
+		[False,True,True,True,False,False],
+		[False,False,True,False,False,False],
+		[False,False,True,False,False,False],
+		[False,False,True,False,False,False],
+		[False,False,True,False,False,False],
+		[False,True,True,False,False,False],
+		[True,True,True,False,False,False]]
 
 -- typy danych
 type Length = Int

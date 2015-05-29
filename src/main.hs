@@ -6,6 +6,7 @@ import System.IO
 
 main :: IO()
 main = do
+		clearScreen 
 		fileName <- readFileName
 		if null fileName
 			then do
@@ -16,6 +17,10 @@ main = do
 				putStrLn $ show rowsClues
 				putStrLn $ show colsClues
 				printRows xss
+
+-- czyści ekrn terminala				
+clearScreen :: IO ()
+clearScreen = putStr "\ESC[2J"
 
 -- wczytaj nazwę pliku ze wskazówkami
 -- zwraca nazwę pliku
@@ -37,11 +42,6 @@ loadClues fileName = do
 					    colsClues = read rawColsClues :: [[Int]]
 					return (rowsClues, colsClues)
 
--- wypisz na stdout odpowiedni znak w zależności czy pole jest zajęte czy nie
-printBox :: Bool -> IO ()
-printBox x = if x then putChar '\9608' else putChar '\9617'
-
-
 -- mapuje printBox na wszystkie wiersze
 printRows :: [[Bool]] -> IO ()
 printRows = mapM_ printRow
@@ -49,6 +49,11 @@ printRows = mapM_ printRow
 								  mapM_ printBox xs
 								  putChar '\n'
 
+-- wypisz na stdout odpowiedni znak w zależności czy pole jest zajęte czy nie
+printBox :: Bool -> IO ()
+printBox x = if x then putChar '\9608' else putChar '\9617'
+
+-- dane testowe
 rss = [[True, True, False, False, True, False, False], 
 	  [True, True, True, True, False, True, True]]
 
