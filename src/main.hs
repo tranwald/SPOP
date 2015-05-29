@@ -37,22 +37,6 @@ loadClues fileName = do
 					    colsClues = read rawColsClues :: [[Int]]
 					return (rowsClues, colsClues)
 
--- sprawdza czy dana lista jest podsekwencją innej listy
-isSubsequenceOf :: (Eq a) => [a] -> [a] -> Bool
-isSubsequenceOf []    _                    = True
-isSubsequenceOf _     []                   = False
-isSubsequenceOf a@(x:a') (y:b) | x == y    = isSubsequenceOf a' b
-                               | otherwise = isSubsequenceOf a b
-
--- sprawdza czy zapełnienie wierszy nie łamie reguł wynikających ze wskazówek
--- xss - lista pól: True - zajęte pole, False - puste
--- rss - lista list ze wskazówkami dla wierszy
-checkRows :: [[Bool]] -> [[Int]] -> Bool
-checkRows xss rss =  allTrue $ zipWith isSubsequenceOf (map groupRows xss) rss 
-					where 
-						groupRows xs = [length x | x <- group xs, allTrue x]
-						allTrue = all (==True)
-
 -- wypisz na stdout odpowiedni znak w zależności czy pole jest zajęte czy nie
 printBox :: Bool -> IO ()
 printBox x = if x then putChar '\9608' else putChar '\9617'
@@ -76,14 +60,3 @@ rss' = [[True, True, False, False, True, True, False],
 rss'' :: [[Bool]]
 rss'' = [[True, True, False, False, False, False, False], 
 	  [True, True, True, True, False, True, True]]
-
-rs :: [[Int]]
-rs = [[2,1], [4,2]]
-
-
-
-r :: [[Int]]
-r = [[3], [2, 2], [2, 2], [3], [1], [1], [1], [1], [2], [3]]
-
-c :: [[Int]]
-c = [[2, 1], [4, 2], [1, 7], [4], [2]]
