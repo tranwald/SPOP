@@ -1,13 +1,6 @@
 import System.IO
 import Data.List
 
--- sprawdza warunki gry po wierszach (porównanie wczytanych wartości z polami 
--- zajmowanymi przez bloki)
-checkRows :: [[Bool]] -> [[Int]] -> Bool
-checkRows xss rss = (map checkRow xss) == rss
-					where checkRow xs = [length x | x <- group xs,
-													all (==True) x]
-
 tests = [[True, True, False, False, True, False, False], 
 	  [True, True, True, True, False, True, True]]
 
@@ -21,7 +14,7 @@ trs = [[2,1], [4,2]]
 rss :: [[Int]]
 rss = [[3], [2, 2], [2, 2], [3], [1], [1], [1], [1], [2], [3]]
 css :: [[Int]]
-css = [[2, 1], [4, 2], [1, 7], [4], [2]]
+css = [[2, 1], [4, 2], [1, 7], [4], [2], []]
 
 
 type Length = Int
@@ -72,3 +65,34 @@ splitAtIdx n cs = (upper, lower)
 				where
 					upper  = take n cs 
 					lower  = drop (n + 1) cs
+
+-- sprawdza czy dana lista jest podsekwencją innej listy
+isSubsequenceOf :: (Eq a) => [a] -> [a] -> Bool
+isSubsequenceOf []    _                    = True
+isSubsequenceOf _     []                   = False
+isSubsequenceOf a@(x:a') (y:b) | x == y    = isSubsequenceOf a' b
+                               | otherwise = isSubsequenceOf a b
+
+-- sprawdza czy zapełnienie wierszy nie łamie reguł wynikających ze wskazówek
+-- xss - lista pól: True - zajęte pole, False - puste
+-- rss - lista list ze wskazówkami dla wierszy
+checkRows :: [[Bool]] -> [[Int]] -> Bool
+checkRows xss rss =  allTrue $ zipWith isSubsequenceOf (map groupRows xss) rss 
+					where 
+						groupRows xs = [length x | x <- group xs, allTrue x]
+						allTrue = all (==True)
+
+-- stara wersja checkRows, wymagająca pełnego zapełnienia wierszy
+checkRows' :: [[Bool]] -> [[Int]] -> Bool
+checkRows' xss rss = (map checkRow xss) == rss
+					where checkRow xs = [length x | x <- group xs,
+													all (==True) x]
+
+-- backtracking
+backtrack :: [[Block]] -> [[Block]] -> [[Bool]]
+backtack  []   _            = undefined
+backtrack (xs:xss) (ys:yss) = undefined
+
+-- wygenerowanie planszy
+genBoard :: [[Block]] -> [[Bool]]
+genBoard xss = 

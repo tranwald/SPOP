@@ -17,7 +17,6 @@ main = do
 				putStrLn $ show colsClues
 				printRows rss
 
-
 -- wczytaj nazwę pliku ze wskazówkami
 -- zwraca nazwę pliku
 readFileName :: IO String
