@@ -15,7 +15,7 @@ main = do
 				(rowsClues, colsClues) <- loadClues fileName
 				putStrLn $ show rowsClues
 				putStrLn $ show colsClues
-				printRows rss
+				printRows xss
 
 -- wczytaj nazwę pliku ze wskazówkami
 -- zwraca nazwę pliku
@@ -49,14 +49,23 @@ printRows = mapM_ printRow
 								  mapM_ printBox xs
 								  putChar '\n'
 
-rss :: [[Bool]]
 rss = [[True, True, False, False, True, False, False], 
 	  [True, True, True, True, False, True, True]]
 
-rss' :: [[Bool]]
 rss' = [[True, True, False, False, True, True, False], 
 	  [True, True, True, True, False, False, True]]
 
-rss'' :: [[Bool]]
 rss'' = [[True, True, False, False, False, False, False], 
 	  [True, True, True, True, False, True, True]]
+
+xss =  [[False,True,True,True,False,False],
+		[True,True,False,True,True,False],
+		[True,True,False,True,True,False],
+		[False,True,True,True,False,False],
+		[False,False,True,False,False,False],
+		[False,False,True,False,False,False],
+		[False,False,True,False,False,False],
+		[False,False,True,False,False,False],
+		[False,True,True,False,False,False],
+		[True,True,True,False,False,False]]
+
