@@ -1,0 +1,39 @@
+module Main where
+
+import System.IO
+import Control.Exception
+import Data.List (group)
+
+main :: IO()
+main = do
+	putStrLn "Please provide the name of the file with clues:"
+	fileName <- getLine
+	{-let readClues inh = do
+						ineof <- hIsEOF inh
+						if ineof
+							then return()
+							else do 
+								rowsClues <- hGetLine inh
+								colsClues <- hGetLine inh-}
+								
+	(rowsClues, colsClues) <- withFile fileName ReadMode readClues
+	putStrLn rowsClues
+	putStrLn colsClues
+
+readClues :: IO([[Int]], [[Int]])
+readClues inh = do
+					ineof <- hIsEOF inh
+					if ineof
+						then return()
+						else do 
+								rowsClues <- hGetLine inh
+								colsClues <- hGetLine inh
+								putStrLn rowsClues
+								return (read rowsClues, read colsClues)
+
+checkRow xs = [length x | x <- group xs, all (==True) x]
+
+type Length = Int
+type Candidates = [Int]
+type Beginning = Int
+data Blocks = Maybe Beginning Length Candidates
