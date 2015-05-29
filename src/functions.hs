@@ -25,9 +25,14 @@ data Block = Block (Maybe Box) Length Candidates deriving (Show)
 -- tworzy listę list bloków na podstawie wejściowych prametrów, każda lista to 
 -- jedna kolumna (ma tyle elementów ile bloków ma być w kolumnie)
 -- rss - rzędy, css - kolumny
-makeBlocks :: [[Int]] -> [[Int]]-> [[Block]]
-makeBlocks rss css  = [[makeBlock n rss cs  | n <- init [0..length cs]] | cs <- css]
+makeColsBlocks :: [[Int]] -> [[Int]]-> [[Block]]
+makeColsBlocks rss css  = [makeColBlocks rss cs | cs <- css]
 
+-- tworzy listę bloków w kolumnie na podstawie wejściowych prametrów
+-- rss - lista list wskazówek rzędów, cs - lista wskazówek kolumny
+makeColBlocks :: [[Int]] -> [Int]-> [Block]
+makeColBlocks rss [] = []
+makeColBlocks rss cs = [makeBlock n rss cs  | n <- init [0..length cs]]
 -- tworzenie pojedynczego bloku (Nothing, długość, dostępne pozycje), przez 
 -- spawdzenie oganiczeń od innych bloków w kolumnie
 -- n - indeks aktualnie przetwazanego bloku, 
@@ -95,4 +100,4 @@ backtrack (xs:xss) (ys:yss) = undefined
 
 -- wygenerowanie planszy
 genBoard :: [[Block]] -> [[Bool]]
-genBoard xss = 
+genBoard xss = undefined
