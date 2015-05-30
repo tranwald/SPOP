@@ -139,9 +139,10 @@ insertBlock xs y = insertListAt xs block $ pos y
 insertListAt :: [a] -> [a] -> Int -> [a]
 insertListAt [] ys _ = ys
 insertListAt xs [] _ = xs
-insertListAt xs ys n | n >= 0         = before ++ ys ++ after
-					 | n < 0          = error "Negative index"
-					 | n >= length xs = error "Index outside the list"
+insertListAt xs ys n | n < 0     = error "Negative index"
+					 | n > diff  = error "Index outside the list"
+					 | otherwise = before ++ ys ++ after
 					where
 						before = take n xs
 						after  = drop (n + length ys) xs
+						diff   = length xs - length ys
