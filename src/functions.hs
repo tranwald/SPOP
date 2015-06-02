@@ -40,12 +40,14 @@ xss =  [[False,True,True,True,False,False],
 		[True,True,True,False,False,False]]
 
 -- typy danych
-type Length = Int
 type Candidates = [Int]
 type Box = Int
 
 -- abstrakcyjny typ dnych reprezentujący pojedyńczy blok
-data Block = Empty | Block (Maybe Box) Length Candidates deriving (Show)
+data Block = Empty | Block { box :: Maybe Box
+							,len :: Int 
+							,cands :: Candidates
+						   } deriving (Show)
 
 -- tworzy listę list bloków na podstawie wejściowych prametrów, każda lista to 
 -- jedna kolumna (ma tyle elementów ile bloków ma być w kolumnie)
@@ -58,6 +60,7 @@ makeAllBlocks rss css  = [makeBlocks rss cs | cs <- css]
 makeBlocks :: [[Int]] -> [Int]-> [Block]
 makeBlocks rss [] = [Empty]
 makeBlocks rss cs = [makeBlock n rss cs  | n <- init [0..length cs]]
+
 -- tworzenie pojedynczego bloku (Nothing, długość, dostępne pozycje), przez 
 -- spawdzenie oganiczeń od innych bloków w kolumnie
 -- n - indeks aktualnie przetwazanego bloku, 
@@ -89,7 +92,7 @@ lowerCands lower rss = init [rssLen - (sum lower + length lower)..rssLen]
 							where rssLen = length rss
 
 -- dzieli listę na dwie części względem aktulnie sprawdzanej pozycji 
--- o indeksie n
+-- o indeksie n i zwraca krotkę zawierającą elementy nad i pod nią
 splitAtIdx :: Int -> [a] -> ([a], [a])
 splitAtIdx n cs = (upper, lower)
 				where
@@ -117,6 +120,8 @@ checkRows xss rss =  allTrue $ zipWith isSubsequenceOf (map groupRows xss) rss
 						allTrue = all (==True)
 
 -- wygenerowanie planszy
+-- xss - lista bloków
+-- h - wysokość planszy
 genBoard :: [[Block]] -> Int -> [[Bool]]
 genBoard xss h = transpose $ map (\xs -> genResCol xs [] h) xss
 
@@ -127,13 +132,14 @@ genResCol [Empty] _  h  = replicate h False
 genResCol xs      [] h  = genResCol xs (replicate h False) h
 genResCol (x:xs)  ys h  = genResCol xs (insertBlock ys x) h 
 
+baseCol :: Int -> [Bool]
+baseCol = \x -> replicate x False
+
 -- zaznacz blok w kolumnie wynikowej
 insertBlock :: [Bool] -> Block -> [Bool]			
-insertBlock xs y = insertListAt xs block $ pos y
+insertBlock xs y = insertListAt xs block $ (fromJust . box) y
 				where
 					block  = replicate (len y) True
-					len (Block box n cands) = n
-					pos (Block box n cands) = fromJust box 
 
 -- naspisuje fragment listy pod indeksem n inną listą podaną jako argument
 insertListAt :: [a] -> [a] -> Int -> [a]
