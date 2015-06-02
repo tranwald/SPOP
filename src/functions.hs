@@ -25,6 +25,10 @@ bss' = [[Block (Just 1) 2 [0,1,2,3,4,5,6],Block (Just 9) 1 [3,4,5,6,7,8,9]],
 
 b :: Block
 b = Block (Just 2) 2 [0,1,2,3,4,5,6]
+
+b' :: Block
+b' = Block Nothing 2 [0,1,2,3,4,5,6]
+
 bs :: [Block]
 bs = [Block (Just 2) 2 [0,1,2,3,4,5,6],Block(Just 5) 1 [3,4,5,6,7,8,9]]
 
@@ -40,14 +44,19 @@ xss =  [[False,True,True,True,False,False],
 		[True,True,True,False,False,False]]
 
 -- typy danych
-type Candidates = [Int]
 type Box = Int
+type Candidates = [Int]
+
 
 -- abstrakcyjny typ dnych reprezentujący pojedyńczy blok
 data Block = Empty | Block { box :: Maybe Box
 							,len :: Int 
 							,cands :: Candidates
-						   } deriving (Show)
+						   } deriving (Show, Eq)
+
+setBox :: Block -> Box -> Block
+setBox (Block Nothing    l cand) box  = Block (Just box) l cand
+setBox (Block (Just box) l cand) box' = Block (Just box') l cand
 
 -- tworzy listę list bloków na podstawie wejściowych prametrów, każda lista to 
 -- jedna kolumna (ma tyle elementów ile bloków ma być w kolumnie)
@@ -105,10 +114,38 @@ isSubsequenceOf []       _                 = True
 isSubsequenceOf _        []                = False
 isSubsequenceOf a@(x:a') (y:b) | x == y    = isSubsequenceOf a' b
                                | otherwise = isSubsequenceOf a b
--- backtracking
-backtrack :: [[Block]] -> [[Block]] -> [[Bool]]
-backtack  []       _        = undefined
-backtrack (xs:xss) (ys:yss) = undefined
+-- zwija listę list w pojedyńczą listę
+flatten :: [[a]] -> [a]
+flatten xss = foldr (++) [] xss
+
+-- rozwija listę bloków w listę list bloków wg listy zawierającej ilość bloków w
+-- poszczególnych kolumnach
+unflatten :: [Block] -> [Int] -> [[Block]]
+unflatten      []    _  = []
+unflatten      xs    [] = [xs]
+unflatten xs'@(x:xs) ys | y == 0    = [[Empty]] ++ unflatten xs ys
+					    | otherwise = [take y xs'] ++ unflatten (drop y xs') ys
+					    where y = head ys
+
+solve :: [[Int]] -> [[Int]] -> [[Int]] -> [[Int]] -> [Block]
+solve rss css = backtrack (flatten $ makeAllBlocks rss css) []
+
+ -- backtracking
+backtrack :: [Block] -> [Block] -> [[Int]] -> [[Int]] -> [Block]
+backtrack []       ys _   _   = ys
+backtrack u@(x:xs) ys rss css = if checkRows result rss
+										then backtrack xs ys' rss css
+										else
+											if (fromJust . box) y' == ub (cands y')
+												then backtrack u ([next (head ys)] ++ tail ys) rss css
+												else backtrack ([next x] ++ xs) ys rss css
+										where
+											result = genBoard (unflatten ys' (map length css)) (length rss)
+											ys'    = [x'] ++ ys
+											x'     = setBox x (head (cands x))
+											y'     = head ys'
+											ub     = head . reverse
+											next   = \x -> setBox x (((fromJust . box) x) + 1)
 
 -- sprawdza czy zapełnienie wierszy nie łamie reguł wynikających ze wskazówek
 -- xss - lista pól: True - zajęte pole, False - puste
@@ -128,10 +165,16 @@ genBoard xss h = transpose $ map (\xs -> genResCol xs [] h) xss
 -- wygenerowanie kolumny do planszy wynikowej
 genResCol :: [Block] -> [Bool] -> Int-> [Bool]
 genResCol []      ys _  = ys
-genResCol [Empty] _  h  = replicate h False
+genResCol [Empty] _  h  = baseCol h
 genResCol xs      [] h  = genResCol xs (replicate h False) h
 genResCol (x:xs)  ys h  = genResCol xs (insertBlock ys x) h 
 
+--genResCol []      ys = ys
+--genResCol [Empty] _  = baseCol
+--genResCol xs      [] = \h -> genResCol xs (baseCol h)
+--genResCol (x:xs)  ys = \h -> genResCol xs (insertBlock ys x)
+
+-- generuje bazową kolumnę wynikową o podanej długości
 baseCol :: Int -> [Bool]
 baseCol = \x -> replicate x False
 
